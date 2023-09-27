@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const { open } = require("sqlite");
+app.use(express.json());
 const sqlite3 = require("sqlite3");
 const path = require("path");
 
@@ -24,6 +25,15 @@ const initializeServerAndDb = async () => {
   }
 };
 initializeServerAndDb();
+
+const DbObjToRespObj = (dbObj) => {
+  return {
+    movieId: databaseObject.movieId,
+    directorId: databaseObject.directorId,
+    movieName: databaseObject.movieName,
+    leadActor: databaseObject.leadActor,
+  };
+};
 
 //Get all movies
 app.get("/movies/", async (request, response) => {
@@ -53,4 +63,16 @@ app.post("/movies/", async (request, response) => {
 
   await database.run(addMovieQuery);
   response.send("Movie Successfully Added");
+});
+
+//Get movie details
+app.get("/movies/:movieId/", async (request, response) => {
+  const movieID = request.params;
+  const movieDetailsQuery = `
+    SELECT * FROM 
+      movie
+    WHERE
+      movie_id = ${movieID};`;
+  const dbResponse = await database.get(movieDetailsQuery);
+  response.send(DbObjToRespObj(dbResponse));
 });
