@@ -138,3 +138,5 @@ app.get("/directors/:directorId/movies/", async (request, response) => {
   const dbResponse = await database.get(directorDetailsQuery);
   response.send(dbResponse);
 });
+
+module.exports = app;
