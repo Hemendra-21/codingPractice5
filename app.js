@@ -5,14 +5,14 @@ app.use(express.json());
 const sqlite3 = require("sqlite3");
 const path = require("path");
 
-const dbpath = path.join(__dirname, "moviesData.db");
+const databasepath = path.join(__dirname, "moviesData.db");
 
 let database = null;
 
 const initializeServerAndDb = async () => {
   try {
     database = await open({
-      filename: dbpath,
+      filename: databasepath,
       driver: sqlite3.Database,
     });
 
@@ -26,12 +26,12 @@ const initializeServerAndDb = async () => {
 };
 initializeServerAndDb();
 
-const DbObjToRespObj = (dbObj) => {
+const DbObjToRespObj = (databaseObject) => {
   return {
-    movieId: databaseObject.movieId,
-    directorId: databaseObject.directorId,
-    movieName: databaseObject.movieName,
-    leadActor: databaseObject.leadActor,
+    movieId: databaseObject.movie_id,
+    directorId: databaseObject.director_id,
+    movieName: databaseObject.movie_name,
+    leadActor: databaseObject.lead_actor,
   };
 };
 
@@ -67,14 +67,16 @@ app.post("/movies/", async (request, response) => {
 
 //Get movie details
 app.get("/movies/:movieId/", async (request, response) => {
-  const movieID = request.params;
+  const { movieId } = request.params;
   const movieDetailsQuery = `
-    SELECT * FROM 
+    SELECT
+      *
+    FROM 
       movie
     WHERE
-      movie_id = ${movieID};`;
+      movie_id = ${movieId};`;
   const dbResponse = await database.get(movieDetailsQuery);
-  response.send(DbObjToRespObj(dbResponse));
+  response.send(dbResponse);
 });
 
 //update movie details
