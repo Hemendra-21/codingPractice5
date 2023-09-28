@@ -11,5 +11,28 @@ content-type:application/json
   "leadActor": "Jeff Goldblum"
 }
 
-###
-GET http://localhost:3000/movies/46
+### API-3 GET Movie Details
+GET http://localhost:3000/movies/46/
+
+
+### API-4 Update details
+PUT http://localhost:3000/movies/46/
+Content-type: application/json 
+
+{
+  "directorId": 24,
+  "movieName": "Thor",
+  "leadActor": "Christopher Hemsworth"
+}
+
+
+### API-5 Delete movie
+DELETE  http://localhost:3000/movies/46/
+
+
+### API-6 Get directors details
+GET http://localhost:3000/directors/
+
+
+### API-7 Get Movies of a director
+GET http://localhost:3000/directors/6/movies/
