@@ -12,7 +12,7 @@ content-type:application/json
 }
 
 ### API-3 GET Movie Details
-GET http://localhost:3000/movies/46/
+GET http://localhost:3000/movies/47/
 
 
 ### API-4 Update details

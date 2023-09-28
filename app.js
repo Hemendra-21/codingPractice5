@@ -35,7 +35,26 @@ const DbObjToRespObj = (databaseObject) => {
   };
 };
 
-//Get all movies
+const convertToCameCase = (databaseObject) => {
+  const modifiedMovies = databaseObject.map((eachMovie) => {
+    return {
+      movieName: eachMovie.movie_name,
+    };
+  });
+  return modifiedMovies;
+};
+
+const convertAPI6Response = (dbResponse) => {
+  const modifiedDirectors = dbResponse.map((eachItem) => {
+    return {
+      directorId: eachItem.director_id,
+      directorName: eachItem.director_name,
+    };
+  });
+  return modifiedDirectors;
+};
+
+//API-1 Get all movies
 app.get("/movies/", async (request, response) => {
   const getMoviesQuery = `
     SELECT 
@@ -43,11 +62,12 @@ app.get("/movies/", async (request, response) => {
     FROM
       movie;`;
 
-  const allMovies = await database.all(getMoviesQuery);
-  response.send(allMovies);
+  const dbResponse = await database.all(getMoviesQuery);
+  const moviesDetails = convertToCameCase(dbResponse);
+  response.send(moviesDetails);
 });
 
-//Create a new movie
+//API-2 Create a new movie
 app.post("/movies/", async (request, response) => {
   const movieDetails = request.body;
   const { directorId, movieName, leadActor } = movieDetails;
@@ -65,7 +85,7 @@ app.post("/movies/", async (request, response) => {
   response.send("Movie Successfully Added");
 });
 
-//Get movie details
+//API-3 Get movie details
 app.get("/movies/:movieId/", async (request, response) => {
   const { movieId } = request.params;
   const movieDetailsQuery = `
@@ -76,10 +96,10 @@ app.get("/movies/:movieId/", async (request, response) => {
     WHERE
       movie_id = ${movieId};`;
   const dbResponse = await database.get(movieDetailsQuery);
-  response.send(dbResponse);
+  response.send(DbObjToRespObj(dbResponse));
 });
 
-//update movie details
+//API-4 update movie details
 app.put("/movies/:movieId/", async (request, response) => {
   const newMovieDetails = request.body;
   const { movieId } = request.params;
@@ -100,7 +120,7 @@ app.put("/movies/:movieId/", async (request, response) => {
   response.send("Movie Details Updated");
 });
 
-//Delete Movie
+//API-5 Delete Movie
 app.delete("/movies/:movieId/", async (request, response) => {
   const { movieId } = request.params;
 
@@ -114,7 +134,7 @@ app.delete("/movies/:movieId/", async (request, response) => {
   response.send("Movie Removed");
 });
 
-//Get all directors details
+//API-6 Get all directors details
 app.get("/directors/", async (request, response) => {
   const directorsDetailsQuery = `
     SELECT 
@@ -122,10 +142,10 @@ app.get("/directors/", async (request, response) => {
     FROM 
       director;`;
   const dbResponse = await database.all(directorsDetailsQuery);
-  response.send(dbResponse);
+  response.send(convertAPI6Response(dbResponse));
 });
 
-//Get all movies of a director
+//API-7 Get all movies of a director
 app.get("/directors/:directorId/movies/", async (request, response) => {
   const { directorId } = request.params;
 
@@ -137,8 +157,8 @@ app.get("/directors/:directorId/movies/", async (request, response) => {
     WHERE 
       director_id = ${directorId};`;
 
-  const dbResponse = await database.get(directorDetailsQuery);
-  response.send(dbResponse);
+  const dbResponse = await database.all(directorDetailsQuery);
+  response.send(convertToCameCase(dbResponse));
 });
 
 module.exports = app;
